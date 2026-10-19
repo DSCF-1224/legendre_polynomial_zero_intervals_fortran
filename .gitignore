@@ -66,3 +66,6 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# fypp-generated source
+src/*.f90
