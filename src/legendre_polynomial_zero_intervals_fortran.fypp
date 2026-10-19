@@ -94,7 +94,7 @@ module ${MODULE_NAME}$
     !! \( ${WHAT_TO_RETURN_ZERO_INTERVAL_UPPER}$ \)
     !! for `real${REAL_KIND}$`
     !! @note
-    !! signaling NaN is returned unless `1 <= k <= n`.
+    !! signaling NaN is returned unless `${MINVAL_INTERVAL_INDEX}$ <= k <= n`.
     !! @endnote
 
     integer(int32), intent(in) :: n
@@ -127,7 +127,7 @@ module ${MODULE_NAME}$
     !! version: experimental
     !! calculate \( ${WHAT_TO_RETURN_ZERO_INTERVAL_LOWER}$ \) for `real${REAL_KIND}$`
     !! @note
-    !! signaling NaN is returned unless `1 <= k <= n`.
+    !! signaling NaN is returned unless `${MINVAL_INTERVAL_INDEX}$ <= k <= n`.
     !! @endnote
 
     integer(int32), intent(in) :: n
@@ -141,7 +141,7 @@ module ${MODULE_NAME}$
       !! \( ${WHAT_TO_RETURN_ZERO_INTERVAL_LOWER}$ \)
 
 
-    if ( (1_int32 <= k) .and. (k <= n) ) then
+    if ( (${MINVAL_INTERVAL_INDEX}$_int32 <= k) .and. (k <= n) ) then
       x = - cos( (k - 0.5_real${REAL_KIND}$) * pi_real${REAL_KIND}$ / (n + 0.5_real${REAL_KIND}$) )
     else
       x = ieee_value(0.0_real${REAL_KIND}$, ieee_signaling_nan)
@@ -174,7 +174,7 @@ module ${MODULE_NAME}$
       !! \( ${WHAT_TO_RETURN_ZERO_INTERVAL_UPPER}$ \)
 
 
-    if ( (1_int32 <= k) .and. (k <= n) ) then
+    if ( (${MINVAL_INTERVAL_INDEX}$_int32 <= k) .and. (k <= n) ) then
       x = - cos( (k * pi_real${REAL_KIND}$) / (n + 0.5_real${REAL_KIND}$) )
     else
       x = ieee_value(0.0_real${REAL_KIND}$, ieee_signaling_nan)

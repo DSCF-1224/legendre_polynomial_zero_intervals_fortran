@@ -26,6 +26,9 @@ ${GET_ZERO_INTERVAL_UPPER_INTERFACE}$_real${real_kind}$
 
 #:set MINVAL_DEGREE = 1
 
+#! must match the indexing assumed in WHAT_TO_RETURN_ZERO_INTERVAL_*
+#:set MINVAL_INTERVAL_INDEX = 1
+
 #:set WHAT_TO_RETURN_ZERO_INTERVAL_LOWER = r'- \cos \{ (k - 1/2) \pi / (n + 1/2) \}'
 #:set WHAT_TO_RETURN_ZERO_INTERVAL_UPPER = r'- \cos \{ k \pi / (n + 1/2) \}'
 
