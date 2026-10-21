@@ -1,0 +1,110 @@
+#:mute
+
+#:include '../src/common.fypp'
+
+#:set PROGRAM_NAME = 'check_interval_order'
+
+#:endmute
+program ${PROGRAM_NAME}$
+
+  use, intrinsic :: iso_fortran_env, only: error_unit
+  use, intrinsic :: iso_fortran_env, only: int32
+  #:for REAL_KIND in REAL_KINDS
+  use, intrinsic :: iso_fortran_env, only: real${REAL_KIND}$
+  #:endfor
+
+  use, intrinsic :: ieee_arithmetic, only: ieee_unordered
+
+  use, non_intrinsic :: ${MODULE_NAME}$, only: ${GET_ZERO_INTERVAL_INTERFACE}$
+
+
+
+  implicit none
+
+
+  block
+
+    integer(int32) :: degree
+
+
+    do degree = ${MINVAL_DEGREE}$_int32, 4096_int32
+      #:for REAL_KIND in REAL_KINDS
+      call ${PROGRAM_NAME}$_real${REAL_KIND}$(degree)
+      #:endfor
+    end do
+
+  end block
+
+  print *, "OK: ${PROGRAM_NAME}$"
+
+
+
+  contains
+
+
+  #:for REAL_KIND in REAL_KINDS
+
+  #:set SUBROUTINE_NAME = PROGRAM_NAME + '_real' + str(REAL_KIND)
+  subroutine ${SUBROUTINE_NAME}$(degree)
+
+    integer(int32), intent(in) :: degree
+
+
+    logical :: flag_ok
+
+    integer(int32) :: k
+
+    real(real${REAL_KIND}$), dimension(${MINVAL_INTERVAL_INDEX}$_int32:degree) :: x_lower, x_upper
+
+
+    flag_ok = .true.
+
+
+    call ${GET_ZERO_INTERVAL_INTERFACE}$( &!
+      n       = degree , &!
+      k       = [(k, k = ${MINVAL_INTERVAL_INDEX}$_int32, degree)], &!
+      x_lower = x_lower, &!
+      x_upper = x_upper  &!
+    )
+
+
+    flag_ok = flag_ok .and. ( .not. any( ieee_unordered( x_lower(:) , x_upper(:) ) ) )
+
+
+    flag_ok = flag_ok .and. ( x_lower(${MINVAL_INTERVAL_INDEX}$_int32) >= -1.0_real${REAL_KIND}$ )
+    flag_ok = flag_ok .and. ( x_upper(degree) <= 1.0_real${REAL_KIND}$ )
+
+
+    flag_ok = flag_ok .and. all( x_lower(:) < x_upper(:) )
+
+
+    if (degree > 1) then
+
+      flag_ok = flag_ok .and. &!
+        all( &!
+          [( &!
+            x_upper(k) < x_lower(k + 1_int32), &!
+            k = ${MINVAL_INTERVAL_INDEX}$_int32, (degree - 1_int32)&!
+          )] &!
+        )
+
+    end if
+
+
+    if (flag_ok) return
+
+
+    do k = ${MINVAL_INTERVAL_INDEX}$_int32, degree
+      write(error_unit, *) k, x_lower(k), x_upper(k)
+    end do
+
+    write(error_unit, '(A,1X,I0)') 'NG: ${SUBROUTINE_NAME}$ @ degree =', degree
+
+    error stop
+
+  end subroutine ${SUBROUTINE_NAME}$
+  #:del SUBROUTINE_NAME
+
+  #:endfor
+  #! REAL_KIND
+end program ${PROGRAM_NAME}$
