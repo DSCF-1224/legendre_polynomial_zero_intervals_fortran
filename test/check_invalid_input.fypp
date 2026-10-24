@@ -1,0 +1,170 @@
+#:mute
+
+#:include '../src/common.fypp'
+
+#:set PROGRAM_NAME = 'check_invalid_input'
+
+#:set NUM_TRIALS = 5
+
+#:endmute
+program ${PROGRAM_NAME}$
+
+  use, intrinsic :: iso_fortran_env, only: error_unit
+  use, intrinsic :: iso_fortran_env, only: int32
+  #:for REAL_KIND in REAL_KINDS
+  use, intrinsic :: iso_fortran_env, only: real${REAL_KIND}$
+  #:endfor
+
+  use, intrinsic :: ieee_arithmetic, only: ieee_is_nan
+
+  use, non_intrinsic :: ${MODULE_NAME}$, only: ${GET_ZERO_INTERVAL_INTERFACE}$
+
+
+
+  implicit none
+
+
+
+  block
+
+    integer(int32) :: degree, k
+
+    integer(int32), dimension(${NUM_TRIALS}$) :: list_k
+
+
+    do degree = ${MINVAL_DEGREE}$_int32, 4096_int32
+      #:for REAL_KIND in REAL_KINDS
+      call ${PROGRAM_NAME}$_index_real${REAL_KIND}$(degree)
+      #:endfor
+    end do
+
+
+    list_k = [(k, k = ${MINVAL_INTERVAL_INDEX}$_int32, ${MINVAL_INTERVAL_INDEX + (NUM_TRIALS - 1)}$_int32)]
+
+
+    do degree = ${MINVAL_DEGREE - NUM_TRIALS}$_int32, ${MINVAL_DEGREE - 1}$_int32
+      #:for REAL_KIND in REAL_KINDS
+      call ${PROGRAM_NAME}$_degree_real${REAL_KIND}$( degree, list_k(:) )
+      #:endfor
+    end do
+
+  end block
+
+  print *, "OK: ${PROGRAM_NAME}$"
+
+
+
+  contains
+
+
+  #:for REAL_KIND in REAL_KINDS
+
+  #:set SUBROUTINE_NAME = PROGRAM_NAME + '_degree_real' + str(REAL_KIND)
+  subroutine ${SUBROUTINE_NAME}$(degree, list_k)
+
+    integer(int32), intent(in) :: degree
+
+    integer(int32), dimension(:), intent(in) :: list_k
+
+
+    logical :: flag_ok
+
+
+    call ${PROGRAM_NAME}$_kernel_real${REAL_KIND}$(degree, list_k(:), flag_ok)
+
+
+    if (flag_ok) return
+
+
+    write(error_unit, '(A,1X,I0)') 'NG: ${SUBROUTINE_NAME}$ @ degree =', degree
+
+    error stop
+
+  end subroutine ${SUBROUTINE_NAME}$
+  #:del SUBROUTINE_NAME
+
+  #:endfor
+  #! REAL_KIND
+
+
+  #:for REAL_KIND in REAL_KINDS
+
+  #:set SUBROUTINE_NAME = PROGRAM_NAME + '_index_real' + str(REAL_KIND)
+  subroutine ${SUBROUTINE_NAME}$(degree)
+
+    integer(int32), intent(in) :: degree
+
+
+    logical :: flag_ok(2)
+
+    integer(int32) :: k
+
+    integer(int32), dimension(${NUM_TRIALS}$) :: list_k
+
+
+    list_k = [(k, k = ${MINVAL_INTERVAL_INDEX - NUM_TRIALS}$_int32, ${MINVAL_INTERVAL_INDEX - 1}$_int32)]
+
+    call ${PROGRAM_NAME}$_kernel_real${REAL_KIND}$( degree, list_k(:), flag_ok(1) )
+
+
+    list_k = [(k, k = (degree + 1_int32), (degree + ${NUM_TRIALS}$_int32))]
+
+    call ${PROGRAM_NAME}$_kernel_real${REAL_KIND}$( degree, list_k(:), flag_ok(2) )
+
+
+    if ( all(flag_ok(:) ) ) return
+
+
+    write(error_unit, '(A,1X,I0)') 'NG: ${SUBROUTINE_NAME}$ @ degree =', degree
+
+    error stop
+
+  end subroutine ${SUBROUTINE_NAME}$
+  #:del SUBROUTINE_NAME
+
+  #:endfor
+  #! REAL_KIND
+
+
+  #:for REAL_KIND in REAL_KINDS
+
+  #:set SUBROUTINE_NAME = PROGRAM_NAME + '_kernel_real' + str(REAL_KIND)
+  subroutine ${SUBROUTINE_NAME}$(degree, list_k, flag_ok)
+
+    integer(int32), intent(in) :: degree
+
+    integer(int32), dimension(:), intent(in) :: list_k
+
+    logical, intent(out) :: flag_ok
+
+
+    logical, dimension( size( list_k(:) ) ) :: validity
+
+    integer(int32) :: i
+
+    real(real${REAL_KIND}$), dimension( size( list_k(:) ) ) :: x_lower, x_upper
+
+
+    call ${GET_ZERO_INTERVAL_INTERFACE}$( &!
+      n       = degree  , &!
+      k       = list_k  , &!
+      x_lower = x_lower , &!
+      x_upper = x_upper   &!
+    )
+
+
+    validity(:) = ieee_is_nan( x_lower(:) ) .and. ieee_is_nan( x_upper(:) )
+    flag_ok     = all( validity(:) )
+
+
+    do i = 1_int32, size( list_k(:) )
+      if ( validity(i) ) cycle
+      write(error_unit, *) list_k(i), x_lower(i), x_upper(i)
+    end do
+
+  end subroutine ${SUBROUTINE_NAME}$
+  #:del SUBROUTINE_NAME
+
+  #:endfor
+  #! REAL_KIND
+end program ${PROGRAM_NAME}$
