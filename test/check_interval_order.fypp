@@ -52,12 +52,11 @@ program ${PROGRAM_NAME}$
 
     logical :: flag_ok
 
+    logical, dimension(${MINVAL_INTERVAL_INDEX}$_int32:degree) :: validity
+
     integer(int32) :: k
 
     real(real${REAL_KIND}$), dimension(${MINVAL_INTERVAL_INDEX}$_int32:degree) :: x_lower, x_upper
-
-
-    flag_ok = .true.
 
 
     call ${GET_ZERO_INTERVAL_INTERFACE}$( &!
@@ -68,35 +67,65 @@ program ${PROGRAM_NAME}$
     )
 
 
-    flag_ok = flag_ok .and. ( .not. any( ieee_unordered( x_lower(:) , x_upper(:) ) ) )
+    block
+
+      validity(:) = .not. ieee_unordered( x_lower(:) , x_upper(:) )
+
+      associate( &!
+        validity_minval => validity(${MINVAL_INTERVAL_INDEX}$_int32) , &!
+        validity_maxval => validity(degree)   &!
+      )
+
+        validity_minval = validity_minval .and. ( x_lower(${MINVAL_INTERVAL_INDEX}$_int32) >= -1.0_real${REAL_KIND}$ )
+        validity_maxval = validity_maxval .and. ( x_upper(degree)  <=  1.0_real${REAL_KIND}$ )
+
+      end associate
+
+      validity(:) = validity(:) .and. ( x_lower(:) < x_upper(:) )
 
 
-    flag_ok = flag_ok .and. ( x_lower(${MINVAL_INTERVAL_INDEX}$_int32) >= -1.0_real${REAL_KIND}$ )
-    flag_ok = flag_ok .and. ( x_upper(degree) <= 1.0_real${REAL_KIND}$ )
+      flag_ok = all( validity(:) )
 
 
-    flag_ok = flag_ok .and. all( x_lower(:) < x_upper(:) )
+      if (.not. flag_ok) then
+        do k = ${MINVAL_INTERVAL_INDEX}$_int32, degree
+          if ( validity(k) ) cycle
+          write(error_unit, *) k, x_lower(k), x_upper(k)
+        end do
+      end if
+
+    end block
 
 
-    if (degree > 1) then
+    if (degree > 1_int32) then
+      associate( maxval_k_adjacent => degree - 1_int32 )
 
-      flag_ok = flag_ok .and. &!
-        all( &!
-          [( &!
-            x_upper(k) < x_lower(k + 1_int32), &!
-            k = ${MINVAL_INTERVAL_INDEX}$_int32, (degree - 1_int32)&!
-          )] &!
-        )
+        validity ( ${MINVAL_INTERVAL_INDEX}$_int32 : maxval_k_adjacent ) = &!
+        x_upper  ( ${MINVAL_INTERVAL_INDEX}$_int32 : maxval_k_adjacent ) < &!
+        x_lower  ( ${MINVAL_INTERVAL_INDEX + 1}$_int32 : degree            )
 
+
+        flag_ok = flag_ok .and. all( validity(${MINVAL_INTERVAL_INDEX}$_int32 : maxval_k_adjacent) )
+
+
+        if (.not. flag_ok) then
+          do k = ${MINVAL_INTERVAL_INDEX}$_int32, maxval_k_adjacent
+
+            if ( validity(k) ) cycle
+
+            write(error_unit, *) &!
+            & k, '[', x_lower(k          ), x_upper(k          ), ']' , &!
+            &    '[', x_lower(k + 1_int32), x_upper(k + 1_int32), ']'
+
+          end do
+        end if
+
+      end associate
     end if
 
 
     if (flag_ok) return
 
-
-    do k = ${MINVAL_INTERVAL_INDEX}$_int32, degree
-      write(error_unit, *) k, x_lower(k), x_upper(k)
-    end do
 
     write(error_unit, '(A,1X,I0)') 'NG: ${SUBROUTINE_NAME}$ @ degree =', degree
 
