@@ -29,7 +29,7 @@ ${GET_ZERO_INTERVAL_UPPER_INTERFACE}$_real${real_kind}$
 #! must match the indexing assumed in WHAT_TO_RETURN_ZERO_INTERVAL_*
 #:set MINVAL_INTERVAL_INDEX = 1
 
-#:set WHAT_TO_RETURN_ZERO_INTERVAL_LOWER = r'- \cos \lbrace (k - 1/2) \pi / (n + 1/2) \rbrace'
-#:set WHAT_TO_RETURN_ZERO_INTERVAL_UPPER = r'- \cos \lbrace k \pi / (n + 1/2) \rbrace'
+#:set WHAT_TO_RETURN_ZERO_INTERVAL_LOWER = r'- \cos \lbrace (k - \tfrac{1}{2}) \pi / (n + \tfrac{1}{2}) \rbrace'
+#:set WHAT_TO_RETURN_ZERO_INTERVAL_UPPER = r'- \cos \lbrace k \pi / (n + \tfrac{1}{2}) \rbrace'
 
 #:endmute
