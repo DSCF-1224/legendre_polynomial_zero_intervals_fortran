@@ -1,5 +1,7 @@
 #:mute
 
+#! generate with: fypp README.fypp README.md -F
+
 #:include 'src/common.fypp'
 #:include 'test/common.fypp'
 

@@ -76,7 +76,7 @@ jobs:
 
       - name: Check README.md is up to date
         run: |
-          fypp README.fypp README.md
+          fypp README.fypp README.md -F
           git diff --exit-code README.md
 
       - name: Run tests (debug)
