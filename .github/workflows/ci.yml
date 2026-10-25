@@ -74,6 +74,11 @@ jobs:
                example/demo.fypp \
                example/demo.f90
 
+      - name: Check README.md is up to date
+        run: |
+          fypp README.fypp README.md
+          git diff --exit-code README.md
+
       - name: Run tests (debug)
         run: fpm test --profile debug
 
