@@ -5,8 +5,6 @@
 
 #:set PROGRAM_NAME = 'check_invalid_input'
 
-#:set NUM_TRIALS = 5
-
 #:endmute
 program ${PROGRAM_NAME}$
 
@@ -30,7 +28,7 @@ program ${PROGRAM_NAME}$
 
     integer(int32) :: degree, k
 
-    integer(int32), dimension(${NUM_TRIALS}$) :: list_k
+    integer(int32), dimension(${NUM_OUT_OF_RANGE_VALUES}$) :: list_k
 
 
     do degree = ${MINVAL_DEGREE}$_int32, ${MAXVAL_DEGREE_TESTED}$_int32
@@ -40,10 +38,10 @@ program ${PROGRAM_NAME}$
     end do
 
 
-    list_k = [(k, k = ${MINVAL_INTERVAL_INDEX}$_int32, ${MINVAL_INTERVAL_INDEX + (NUM_TRIALS - 1)}$_int32)]
+    list_k = [(k, k = ${MINVAL_INTERVAL_INDEX}$_int32, ${MINVAL_INTERVAL_INDEX + (NUM_OUT_OF_RANGE_VALUES - 1)}$_int32)]
 
 
-    do degree = ${MINVAL_DEGREE - NUM_TRIALS}$_int32, ${MINVAL_DEGREE - 1}$_int32
+    do degree = ${MINVAL_DEGREE - NUM_OUT_OF_RANGE_VALUES}$_int32, ${MINVAL_DEGREE - 1}$_int32
       #:for REAL_KIND in REAL_KINDS
       call ${PROGRAM_NAME}$_degree_real${REAL_KIND}$( degree, list_k(:) )
       #:endfor
@@ -100,15 +98,15 @@ program ${PROGRAM_NAME}$
 
     integer(int32) :: k
 
-    integer(int32), dimension(${NUM_TRIALS}$) :: list_k
+    integer(int32), dimension(${NUM_OUT_OF_RANGE_VALUES}$) :: list_k
 
 
-    list_k = [(k, k = ${MINVAL_INTERVAL_INDEX - NUM_TRIALS}$_int32, ${MINVAL_INTERVAL_INDEX - 1}$_int32)]
+    list_k = [(k, k = ${MINVAL_INTERVAL_INDEX - NUM_OUT_OF_RANGE_VALUES}$_int32, ${MINVAL_INTERVAL_INDEX - 1}$_int32)]
 
     call ${PROGRAM_NAME}$_kernel_real${REAL_KIND}$( degree, list_k(:), flag_ok(1) )
 
 
-    list_k = [(k, k = (degree + 1_int32), (degree + ${NUM_TRIALS}$_int32))]
+    list_k = [(k, k = (degree + 1_int32), (degree + ${NUM_OUT_OF_RANGE_VALUES}$_int32))]
 
     call ${PROGRAM_NAME}$_kernel_real${REAL_KIND}$( degree, list_k(:), flag_ok(2) )
 

@@ -2,4 +2,6 @@
 
 #:set MAXVAL_DEGREE_TESTED = 4096
 
+#:set NUM_OUT_OF_RANGE_VALUES = 5
+
 #:endmute
