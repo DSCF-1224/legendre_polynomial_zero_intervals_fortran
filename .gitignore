@@ -70,3 +70,4 @@ Testing/
 # fypp-generated source
 src/*.f90
 test/*.f90
+example/*.f90
