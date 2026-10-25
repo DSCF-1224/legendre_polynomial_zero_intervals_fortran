@@ -1,0 +1,5 @@
+#:mute
+
+#:set MAXVAL_DEGREE_TESTED = 4096
+
+#:endmute

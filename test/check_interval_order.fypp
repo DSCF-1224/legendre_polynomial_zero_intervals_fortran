@@ -1,6 +1,7 @@
 #:mute
 
 #:include '../src/common.fypp'
+#:include 'common.fypp'
 
 #:set PROGRAM_NAME = 'check_interval_order'
 
@@ -27,7 +28,7 @@ program ${PROGRAM_NAME}$
     integer(int32) :: degree
 
 
-    do degree = ${MINVAL_DEGREE}$_int32, 4096_int32
+    do degree = ${MINVAL_DEGREE}$_int32, ${MAXVAL_DEGREE_TESTED}$_int32
       #:for REAL_KIND in REAL_KINDS
       call ${PROGRAM_NAME}$_real${REAL_KIND}$(degree)
       #:endfor
