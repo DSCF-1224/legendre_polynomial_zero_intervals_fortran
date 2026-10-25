@@ -15,10 +15,10 @@ It does not evaluate $P_n$; how the intervals are used (e.g. as starting points 
 
 The $k$-th zero $x_k$ of $P_n$, numbered in ascending order of $x$, satisfies
 
-$$
+```math
 ${WHAT_TO_RETURN_ZERO_INTERVAL_LOWER}$ < x_k < ${WHAT_TO_RETURN_ZERO_INTERVAL_UPPER}$,
 \qquad k = ${MINVAL_INTERVAL_INDEX}$, \dots, n .
-$$
+```
 
 The intervals are pairwise disjoint, so each contains exactly one zero.
 

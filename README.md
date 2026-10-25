@@ -9,10 +9,10 @@ It does not evaluate $P_n$; how the intervals are used (e.g. as starting points 
 
 The $k$-th zero $x_k$ of $P_n$, numbered in ascending order of $x$, satisfies
 
-$$
-- \cos \{ (k - 1/2) \pi / (n + 1/2) \} < x_k < - \cos \{ k \pi / (n + 1/2) \},
+```math
+- \cos \lbrace (k - 1/2) \pi / (n + 1/2) \rbrace < x_k < - \cos \lbrace k \pi / (n + 1/2) \rbrace,
 \qquad k = 1, \dots, n .
-$$
+```
 
 The intervals are pairwise disjoint, so each contains exactly one zero.
 
@@ -37,8 +37,8 @@ All procedures are `elemental subroutine`s; `k` may be an array.
 | Generic name | Returns |
 | --- | --- |
 | `get_zero_interval(n, k, x_lower, x_upper)` | both endpoints |
-| `get_zero_interval_lower(n, k, x)` | $- \cos \{ (k - 1/2) \pi / (n + 1/2) \}$ |
-| `get_zero_interval_upper(n, k, x)` | $- \cos \{ k \pi / (n + 1/2) \}$ |
+| `get_zero_interval_lower(n, k, x)` | $- \cos \lbrace (k - 1/2) \pi / (n + 1/2) \rbrace$ |
+| `get_zero_interval_upper(n, k, x)` | $- \cos \lbrace k \pi / (n + 1/2) \rbrace$ |
 
 - `n`, `k`: `integer(int32)`
 - `x`, `x_lower`, `x_upper`: `real(real32)`, `real(real64)`, or `real(real128)` (`with_real128` only)
