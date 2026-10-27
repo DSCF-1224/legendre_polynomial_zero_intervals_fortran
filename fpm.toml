@@ -1,0 +1,12 @@
+name = "legendre_polynomial_zero_intervals_fortran"
+version = "0.1.0"
+license = "MIT"
+author = "DSCF-1224"
+maintainer = "37315588+DSCF-1224@users.noreply.github.com"
+copyright = "Copyright 2026, DSCF-1224"
+[install]
+library = true
+[fortran]
+implicit-typing = false
+implicit-external = false
+source-form = "free"

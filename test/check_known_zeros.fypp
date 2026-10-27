@@ -1,0 +1,119 @@
+#:mute
+
+#:include '../src/common.fypp'
+
+#:set PROGRAM_NAME = 'check_known_zeros'
+
+#:endmute
+program ${PROGRAM_NAME}$
+
+  use, intrinsic :: iso_fortran_env, only: error_unit
+  use, intrinsic :: iso_fortran_env, only: int32
+  #:for REAL_KIND in REAL_KINDS
+  use, intrinsic :: iso_fortran_env, only: real${REAL_KIND}$
+  #:endfor
+
+  use, non_intrinsic :: ${MODULE_NAME}$, only: ${GET_ZERO_INTERVAL_INTERFACE}$
+
+
+
+  implicit none
+
+
+
+  #:for REAL_KIND in REAL_KINDS
+  block
+
+    real(real${REAL_KIND}$), parameter :: zero_degree2_2 = sqrt( 1.0_real${REAL_KIND}$ / 3.0_real${REAL_KIND}$ )
+    real(real${REAL_KIND}$), parameter :: zero_degree2_1 = - zero_degree2_2
+
+    real(real${REAL_KIND}$), parameter :: zero_degree3_3 = sqrt( 3.0_real${REAL_KIND}$ / 5.0_real${REAL_KIND}$ )
+    real(real${REAL_KIND}$), parameter :: zero_degree3_1 = - zero_degree3_3
+
+    real(real${REAL_KIND}$), parameter :: zero_degree4_4 = sqrt( ( 3.0_real${REAL_KIND}$ + sqrt(4.8_real${REAL_KIND}$) ) / 7.0_real${REAL_KIND}$ )
+    real(real${REAL_KIND}$), parameter :: zero_degree4_3 = sqrt( ( 3.0_real${REAL_KIND}$ - sqrt(4.8_real${REAL_KIND}$) ) / 7.0_real${REAL_KIND}$ )
+    real(real${REAL_KIND}$), parameter :: zero_degree4_2 = - zero_degree4_3
+    real(real${REAL_KIND}$), parameter :: zero_degree4_1 = - zero_degree4_4
+
+    real(real${REAL_KIND}$), parameter :: zero_degree5_5 = sqrt( 5.0_real${REAL_KIND}$ + sqrt(40.0_real${REAL_KIND}$ / 7.0_real${REAL_KIND}$) ) / 3.0_real${REAL_KIND}$
+    real(real${REAL_KIND}$), parameter :: zero_degree5_4 = sqrt( 5.0_real${REAL_KIND}$ - sqrt(40.0_real${REAL_KIND}$ / 7.0_real${REAL_KIND}$) ) / 3.0_real${REAL_KIND}$
+    real(real${REAL_KIND}$), parameter :: zero_degree5_2 = - zero_degree5_4
+    real(real${REAL_KIND}$), parameter :: zero_degree5_1 = - zero_degree5_5
+
+
+    call ${PROGRAM_NAME}$_real${REAL_KIND}$( &!
+      [0.0_real${REAL_KIND}$] &!
+    )
+
+    call ${PROGRAM_NAME}$_real${REAL_KIND}$( &!
+      [zero_degree2_1, zero_degree2_2] &!
+    )
+
+    call ${PROGRAM_NAME}$_real${REAL_KIND}$( &!
+      [zero_degree3_1, 0.0_real${REAL_KIND}$, zero_degree3_3] &!
+    )
+
+    call ${PROGRAM_NAME}$_real${REAL_KIND}$( &!
+      [zero_degree4_1, zero_degree4_2, zero_degree4_3, zero_degree4_4] &!
+    )
+
+    call ${PROGRAM_NAME}$_real${REAL_KIND}$( &!
+      [zero_degree5_1, zero_degree5_2, 0.0_real${REAL_KIND}$, zero_degree5_4, zero_degree5_5] &!
+    )
+
+  end block
+  #:endfor
+
+  print *, 'OK: ${PROGRAM_NAME}$'
+
+
+
+  contains
+
+
+  #:for REAL_KIND in REAL_KINDS
+
+  #:set SUBROUTINE_NAME = PROGRAM_NAME + '_real' + str(REAL_KIND)
+  subroutine ${SUBROUTINE_NAME}$(zeros)
+
+    real(real${REAL_KIND}$), intent(in), dimension(:) :: zeros
+
+
+    logical, dimension( size( zeros(:) ) ) :: validity_lower, validity_upper
+
+    integer(int32) :: k
+
+    real(real${REAL_KIND}$), dimension( size( zeros(:) ) ) :: x_lower, x_upper
+
+
+    associate( n => size( zeros(:), kind=int32 ) )
+
+      call ${GET_ZERO_INTERVAL_INTERFACE}$( &!
+        n       = n, &!
+        k       = [(k, k = ${MINVAL_INTERVAL_INDEX}$_int32, n)], &!
+        x_lower = x_lower, &!
+        x_upper = x_upper  &!
+      )
+
+
+      validity_lower(:) = x_lower(:) < zeros(:)
+      validity_upper(:) = zeros(:) < x_upper(:)
+
+      if ( all( validity_lower(:) ) .and. all( validity_upper(:) ) ) return
+
+
+      do k = ${MINVAL_INTERVAL_INDEX}$_int32, n
+        write(error_unit, *) k, x_lower(k), zeros(k), x_upper(k), validity_lower(k), validity_upper(k)
+      end do
+
+      write(error_unit, *) 'NG: ${SUBROUTINE_NAME}$'
+
+      error stop
+
+    end associate
+
+  end subroutine ${SUBROUTINE_NAME}$
+  #:del SUBROUTINE_NAME
+
+  #:endfor
+end program ${PROGRAM_NAME}$
