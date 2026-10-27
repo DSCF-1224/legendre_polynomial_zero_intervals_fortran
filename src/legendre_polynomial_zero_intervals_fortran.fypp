@@ -94,7 +94,7 @@ module ${MODULE_NAME}$
     !! \( ${WHAT_TO_RETURN_ZERO_INTERVAL_UPPER}$ \)
     !! for `real${REAL_KIND}$`
     !! @note
-    !! signaling NaN is returned unless `${MINVAL_INTERVAL_INDEX}$ <= k <= n`.
+    !! signaling NaN is returned unless `${DOC_ARGUMENT_K_VALID_RANGE}$`.
     !! @endnote
 
     integer(int32), intent(in) :: n
@@ -127,7 +127,7 @@ module ${MODULE_NAME}$
     !! version: experimental
     !! calculate \( ${WHAT_TO_RETURN_ZERO_INTERVAL_LOWER}$ \) for `real${REAL_KIND}$`
     !! @note
-    !! signaling NaN is returned unless `${MINVAL_INTERVAL_INDEX}$ <= k <= n`.
+    !! signaling NaN is returned unless `${DOC_ARGUMENT_K_VALID_RANGE}$`.
     !! @endnote
 
     integer(int32), intent(in) :: n
@@ -160,7 +160,7 @@ module ${MODULE_NAME}$
     !! version: experimental
     !! calculate \( ${WHAT_TO_RETURN_ZERO_INTERVAL_UPPER}$ \) for `real${REAL_KIND}$`
     !! @note
-    !! signaling NaN is returned unless `1 <= k <= n`.
+    !! signaling NaN is returned unless `${DOC_ARGUMENT_K_VALID_RANGE}$`.
     !! @endnote
 
     integer(int32), intent(in) :: n

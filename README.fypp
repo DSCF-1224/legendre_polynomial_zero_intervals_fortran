@@ -48,7 +48,7 @@ All procedures are `elemental subroutine`s; `k` may be an array.
 
 ### Invalid input
 
-A signaling NaN is returned unless `${MINVAL_INTERVAL_INDEX}$ <= k <= n` (this includes every `k` when `n < ${MINVAL_DEGREE}$`).
+A signaling NaN is returned unless `${DOC_ARGUMENT_K_VALID_RANGE}$` (this includes every `k` when `n < ${MINVAL_DEGREE}$`).
 
 ## Usage
 
