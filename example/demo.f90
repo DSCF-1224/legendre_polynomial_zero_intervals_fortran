@@ -1,8 +1,3 @@
-#:mute
-
-#:include '../src/common.fypp'
-
-#:endmute
 program demo
 
   use, intrinsic :: iso_fortran_env, only: int32, real64
@@ -21,10 +16,10 @@ program demo
   real(real64), dimension(n) :: x_lower, x_upper
 
 
-  call get_zero_interval(n, [(k, k = ${MINVAL_INTERVAL_INDEX}$_int32, n)], x_lower, x_upper)
+  call get_zero_interval(n, [(k, k = 1_int32, n)], x_lower, x_upper)
 
 
-  do k = ${MINVAL_INTERVAL_INDEX}$_int32, n
+  do k = 1_int32, n
     print *, k, ': [', x_lower(k), ',', x_upper(k), ']'
   end do
 
